@@ -92,6 +92,7 @@ h1 em{font-style:italic;color:var(--rose-deep);}
 .admin-pw-btn{background:var(--rose-deep);color:white;border:none;border-radius:50px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;}
 .admin-pw-error{color:#c85d88;font-size:.8rem;margin-top:6px;display:none;}
 .back-link{font-size:.78rem;color:var(--text-soft);cursor:pointer;text-decoration:underline;margin-top:1rem;display:inline-block;}
+.loading-msg{font-size:.82rem;color:var(--text-soft);text-align:center;font-style:italic;padding:.5rem 0;}
 </style>
 </head>
 <body>
@@ -169,7 +170,10 @@ h1 em{font-style:italic;color:var(--rose-deep);}
 
       <div class="votes-section">
         <p class="votes-title">🗓️ Availability so far</p>
-        <div class="vote-bars" id="voteBars"></div>
+        <div id="voteBarsWrap">
+          <div class="loading-msg" id="barsLoading">Loading responses... 🌸</div>
+          <div class="vote-bars" id="voteBars" style="display:none;"></div>
+        </div>
       </div>
 
       <div class="signature">
@@ -208,23 +212,25 @@ h1 em{font-style:italic;color:var(--rose-deep);}
       <div class="admin-badge">Marcky only</div>
     </div>
 
-    <div class="winner-card" id="winnerCard">
+    <div class="winner-card">
       <div class="winner-label">✨ Best date for everyone</div>
-      <div class="winner-date" id="winnerDate">No responses yet</div>
+      <div class="winner-date" id="winnerDate">Loading... 🌸</div>
       <div class="winner-count" id="winnerCount"></div>
     </div>
 
     <div style="margin-bottom:1.4rem;">
       <div class="admin-section-label">📊 Availability breakdown</div>
-      <div class="vote-bars" id="adminVoteBars"></div>
+      <div class="vote-bars" id="adminVoteBars"><div class="loading-msg">Loading... 🌸</div></div>
     </div>
 
     <div>
       <div class="admin-section-label">👯 Who said what</div>
-      <div class="responses-list" id="responsesList"></div>
+      <div class="responses-list" id="responsesList"><div class="loading-msg">Loading... 🌸</div></div>
     </div>
 
     <div style="margin-top:1.5rem;text-align:center;">
+      <button class="admin-pw-btn" onclick="loadAdminData()" style="margin-bottom:10px;font-size:.8rem;padding:8px 20px;">Refresh 🔄</button>
+      <br/>
       <span class="back-link" onclick="showInvite()">← Back to invite</span>
     </div>
   </div>
@@ -232,12 +238,13 @@ h1 em{font-style:italic;color:var(--rose-deep);}
 </div>
 
 <script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMpoXCqwl9s1BWhRxatCIWXB7_dDE1XtXhF5Fs_ekLvv_OUuTxH6mxKiWoa5Eo3riRoA/exec";
   const DATE_LABELS = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Custom date"];
   const DATE_FULL = ["Saturday, June 6","Sunday, June 7","Saturday, June 13","a custom date"];
   const ADMIN_PW = "marcky2026";
+  const KNOWN_DATES = ["Sat Jun 6","Sun Jun 7","Sat Jun 13"];
 
-  let votes = [0,0,0,0];
-  let responses = [];
+  let localVotes = [0,0,0,0];
   let selectedDates = new Set();
   let customSelected = false;
 
@@ -267,7 +274,7 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     else { selectedDates.delete(3); }
   }
 
-  function renderVoteBars(containerId) {
+  function renderVoteBars(containerId, votes) {
     const max = Math.max(...votes, 1);
     const container = document.getElementById(containerId);
     container.innerHTML = '';
@@ -281,7 +288,7 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     });
   }
 
-  function updatePills() {
+  function updatePillsFromVotes(votes) {
     for (let i=0;i<4;i++) {
       const el = document.getElementById('pill-'+i);
       if (el) el.textContent = votes[i]===1?'1 available':votes[i]+' available';
@@ -307,6 +314,33 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
   }
 
+  // Fetch current votes from sheet and update bars + pills
+  function loadPublicVotes() {
+    fetch(SCRIPT_URL)
+      .then(r => r.json())
+      .then(data => {
+        const votes = [0,0,0,0];
+        data.forEach(row => {
+          if (!row.dates) return;
+          row.dates.forEach(d => {
+            d = d.trim();
+            if (d === "Sat Jun 6") votes[0]++;
+            else if (d === "Sun Jun 7") votes[1]++;
+            else if (d === "Sat Jun 13") votes[2]++;
+            else if (d) votes[3]++;
+          });
+        });
+        localVotes = votes;
+        updatePillsFromVotes(votes);
+        document.getElementById('barsLoading').style.display='none';
+        document.getElementById('voteBars').style.display='flex';
+        renderVoteBars('voteBars', votes);
+      })
+      .catch(() => {
+        document.getElementById('barsLoading').textContent = 'Could not load responses 🌸';
+      });
+  }
+
   function submitYes() {
     const name = document.getElementById('nameInput').value.trim();
     if (!name) {
@@ -319,31 +353,43 @@ h1 em{font-style:italic;color:var(--rose-deep);}
       document.getElementById('datesGrid').style.borderRadius='16px';
       setTimeout(()=>{document.getElementById('datesGrid').style.outline='';},1200); return;
     }
-    if (selectedDates.has(3)) {
-      const val = document.getElementById('customDateInput').value;
-      if (!val) { document.getElementById('customDateInput').focus(); return; }
+    const customVal = document.getElementById('customDateInput').value;
+    if (selectedDates.has(3) && !customVal) {
+      document.getElementById('customDateInput').focus(); return;
     }
 
     const pickedIdxs = [...selectedDates];
-    pickedIdxs.forEach(i => votes[i]++);
-    updatePills();
-    renderVoteBars('voteBars');
-
-    const customVal = document.getElementById('customDateInput').value;
     const pickedLabels = pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_FULL[i]);
-    responses.push({name, dates: pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_LABELS[i])});
+    const dateStrings = pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_LABELS[i]);
 
-    const datesStr = pickedLabels.length===1
-      ? pickedLabels[0]
-      : pickedLabels.slice(0,-1).join(', ')+' & '+pickedLabels[pickedLabels.length-1];
+    const btn = document.querySelector('.btn-yes');
+    btn.textContent = 'Sending... 💕';
+    btn.disabled = true;
 
-    document.getElementById('successMsg').innerHTML =
-      `Can't wait to see you, <strong>${name}</strong>! 🧸<br/>
-       You're free on <em>${datesStr}</em>.<br/>
-       Marcky will lock in the best date for everyone 💕`;
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({name, dates: dateStrings})
+    })
+    .then(() => {
+      const datesStr = pickedLabels.length===1
+        ? pickedLabels[0]
+        : pickedLabels.slice(0,-1).join(', ')+' & '+pickedLabels[pickedLabels.length-1];
 
-    document.getElementById('formContent').classList.add('hide');
-    document.getElementById('successScreen').classList.add('show');
+      document.getElementById('successMsg').innerHTML =
+        `Can't wait to see you, <strong>${name}</strong>! 🧸<br/>
+         You're free on <em>${datesStr}</em>.<br/>
+         Marcky will lock in the best date for everyone 💕`;
+
+      document.getElementById('formContent').classList.add('hide');
+      document.getElementById('successScreen').classList.add('show');
+    })
+    .catch(() => {
+      btn.textContent = 'Count me in! 💕';
+      btn.disabled = false;
+      alert('Something went wrong 🙈 Please try again!');
+    });
   }
 
   function showAdmin() {
@@ -358,39 +404,71 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     const val = document.getElementById('pwInput').value;
     if (val === ADMIN_PW) {
       document.getElementById('adminLoginView').style.display='none';
-      renderAdminView();
       document.getElementById('adminView').classList.add('show');
+      loadAdminData();
     } else {
       document.getElementById('pwError').style.display='block';
     }
   }
 
-  function renderAdminView() {
-    renderVoteBars('adminVoteBars');
-    const maxVotes = Math.max(...votes);
-    const winnerIdx = votes.indexOf(maxVotes);
-    const winnerEl = document.getElementById('winnerDate');
-    const countEl = document.getElementById('winnerCount');
-    if (maxVotes === 0) {
-      winnerEl.innerHTML = '<span class="no-winner">No responses yet — share the link!</span>';
-      countEl.textContent = '';
-    } else {
-      const ties = votes.filter(v=>v===maxVotes).length;
-      winnerEl.textContent = DATE_FULL[winnerIdx];
-      countEl.textContent = ties>1
-        ? `${maxVotes} girl${maxVotes>1?'s':''} available · tied with ${ties-1} other date${ties>2?'s':''}`
-        : `${maxVotes} girl${maxVotes>1?'s':''} available`;
-    }
-    const list = document.getElementById('responsesList');
-    if (responses.length === 0) {
-      list.innerHTML = '<div class="empty-state">No RSVPs yet 🌸</div>';
-    } else {
-      list.innerHTML = responses.map(r=>`
-        <div class="response-row">
-          <div class="response-name">👩 ${r.name}</div>
-          <div class="response-dates">${r.dates.map(d=>`<span class="response-date-pill">${d}</span>`).join('')}</div>
-        </div>`).join('');
-    }
+  function loadAdminData() {
+    document.getElementById('adminVoteBars').innerHTML='<div class="loading-msg">Loading... 🌸</div>';
+    document.getElementById('responsesList').innerHTML='<div class="loading-msg">Loading... 🌸</div>';
+    document.getElementById('winnerDate').textContent='Loading... 🌸';
+    document.getElementById('winnerCount').textContent='';
+
+    fetch(SCRIPT_URL)
+      .then(r => r.json())
+      .then(data => {
+        // skip header row if present
+        const rows = data.filter(r => r.name && r.name !== 'name' && r.name !== 'Name');
+
+        const votes = [0,0,0,0];
+        rows.forEach(row => {
+          if (!row.dates) return;
+          row.dates.forEach(d => {
+            d = d.trim();
+            if (d === "Sat Jun 6") votes[0]++;
+            else if (d === "Sun Jun 7") votes[1]++;
+            else if (d === "Sat Jun 13") votes[2]++;
+            else if (d) votes[3]++;
+          });
+        });
+
+        renderVoteBars('adminVoteBars', votes);
+
+        const maxVotes = Math.max(...votes);
+        const winnerEl = document.getElementById('winnerDate');
+        const countEl = document.getElementById('winnerCount');
+        if (maxVotes === 0) {
+          winnerEl.innerHTML = '<span class="no-winner">No responses yet — share the link!</span>';
+          countEl.textContent = '';
+        } else {
+          const winnerIdx = votes.indexOf(maxVotes);
+          const ties = votes.filter(v=>v===maxVotes).length;
+          const winnerNames = ["Saturday, June 6","Sunday, June 7","Saturday, June 13","a custom date"];
+          winnerEl.textContent = winnerNames[winnerIdx];
+          countEl.textContent = ties>1
+            ? `${maxVotes} girl${maxVotes>1?'s':''} available · tied with ${ties-1} other date${ties>2?'s':''}`
+            : `${maxVotes} girl${maxVotes>1?'s':''} available`;
+        }
+
+        const list = document.getElementById('responsesList');
+        if (rows.length === 0) {
+          list.innerHTML = '<div class="empty-state">No RSVPs yet 🌸</div>';
+        } else {
+          list.innerHTML = rows.map(r=>`
+            <div class="response-row">
+              <div class="response-name">👩 ${r.name}</div>
+              <div class="response-dates">${r.dates.map(d=>`<span class="response-date-pill">${d.trim()}</span>`).join('')}</div>
+            </div>`).join('');
+        }
+      })
+      .catch(() => {
+        document.getElementById('adminVoteBars').innerHTML='<div class="loading-msg">Could not load data 🙈</div>';
+        document.getElementById('responsesList').innerHTML='<div class="loading-msg">Could not load data 🙈</div>';
+        document.getElementById('winnerDate').textContent='Could not load 🙈';
+      });
   }
 
   function showInvite() {
@@ -399,7 +477,8 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     document.getElementById('inviteView').style.display='block';
   }
 
-  renderVoteBars('voteBars');
+  // Load live votes on page open
+  loadPublicVotes();
 
   if (window.location.search.includes('admin=true')) showAdmin();
 </script>
