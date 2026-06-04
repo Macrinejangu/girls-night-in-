@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Casa Marcky – Pajama Night</title>
+<title>Casa Marcky – Pajama Night 🌙</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -70,8 +69,6 @@ h1 em{font-style:italic;color:var(--rose-deep);}
 .signature{text-align:center;margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid #f5dce8;}
 .signature-text{font-family:'Playfair Display',serif;font-style:italic;color:var(--rose-deep);font-size:1.1rem;}
 .signature-sub{font-size:.75rem;color:var(--text-soft);margin-top:2px;font-weight:300;}
-
-/* ADMIN */
 .admin-screen{display:none;padding:.5rem 0;}
 .admin-screen.show{display:block;}
 .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
@@ -105,7 +102,7 @@ h1 em{font-style:italic;color:var(--rose-deep);}
     <div class="form-content" id="formContent">
       <div class="emoji-row">🌙 🧸 ✨</div>
       <h1>You're invited, <em>love</em></h1>
-      <p class="subtitle">to a cosy pajama night & chill hangout</p>
+      <p class="subtitle">to a cosy pajama night &amp; chill hangout</p>
       <div class="venue-tag">🏡 Casa Marcky &nbsp;·&nbsp; <span style="font-weight:300;font-style:italic">my place!</span></div>
 
       <p class="section-label">Pick every night you can make it ✨</p>
@@ -235,188 +232,176 @@ h1 em{font-style:italic;color:var(--rose-deep);}
 </div>
 
 <script>
-const DATE_LABELS = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Custom date"];
-const DATE_FULL = ["Saturday, June 6","Sunday, June 7","Saturday, June 13","a custom date"];
-const ADMIN_PW = "marcky2026";
+  const DATE_LABELS = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Custom date"];
+  const DATE_FULL = ["Saturday, June 6","Sunday, June 7","Saturday, June 13","a custom date"];
+  const ADMIN_PW = "marcky2026";
 
-let votes = [0,0,0,0];
-let responses = [];
-let selectedDates = new Set();
-let customSelected = false;
+  let votes = [0,0,0,0];
+  let responses = [];
+  let selectedDates = new Set();
+  let customSelected = false;
 
-function toggleDate(idx) {
-  const opt = document.querySelectorAll('.date-option')[idx];
-  const chk = document.getElementById('check-'+idx);
-  if (selectedDates.has(idx)) {
-    selectedDates.delete(idx);
-    opt.classList.remove('selected');
-    chk.textContent = '';
-  } else {
-    selectedDates.add(idx);
-    opt.classList.add('selected');
-    chk.textContent = '✓';
-  }
-}
-
-function toggleCustom() {
-  const wrap = document.getElementById('customWrap');
-  const inp = document.getElementById('customDateInput');
-  const chk = document.getElementById('check-3');
-  customSelected = !customSelected;
-  wrap.classList.toggle('selected', customSelected);
-  inp.classList.toggle('show', customSelected);
-  chk.textContent = customSelected ? '✓' : '';
-  if (customSelected) {
-    selectedDates.add(3);
-    inp.focus();
-  } else {
-    selectedDates.delete(3);
-  }
-}
-
-function renderVoteBars(containerId) {
-  const max = Math.max(...votes, 1);
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  const labels = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Other"];
-  labels.forEach((lbl,i) => {
-    const pct = Math.round((votes[i]/max)*100);
-    container.innerHTML += `<div class="vote-bar-row">
-      <div class="vote-bar-label">${lbl}</div>
-      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%"></div></div>
-      <div class="vote-bar-count">${votes[i]}</div>
-    </div>`;
-  });
-}
-
-function updatePills() {
-  for (let i=0;i<4;i++) {
-    const el = document.getElementById('pill-'+i);
-    if (el) el.textContent = votes[i]===1?'1 available':votes[i]+' available';
-  }
-}
-
-function runAway() {
-  const btn = document.getElementById('btnNo');
-  const row = document.getElementById('btnRow');
-  const rowRect = row.getBoundingClientRect();
-  const btnRect = btn.getBoundingClientRect();
-  const maxX = rowRect.width - btnRect.width - 10;
-  const nx = Math.max(0, Math.random()*maxX);
-  const ny = (Math.random()-0.5)*40;
-  btn.style.left = nx+'px';
-  btn.style.top = ny+'px';
-  btn.style.right = 'unset';
-  btn.style.transition = 'left 0.18s ease, top 0.18s ease';
-}
-
-function submitYes() {
-  const name = document.getElementById('nameInput').value.trim();
-  if (!name) {
-    const inp = document.getElementById('nameInput');
-    inp.focus(); inp.style.borderColor='#e07a99';
-    setTimeout(()=>inp.style.borderColor='',1200); return;
-  }
-  if (selectedDates.size === 0) {
-    document.getElementById('datesGrid').style.outline='2px solid #f4a7b9';
-    document.getElementById('datesGrid').style.borderRadius='16px';
-    setTimeout(()=>{document.getElementById('datesGrid').style.outline='';},1200); return;
-  }
-  if (selectedDates.has(3)) {
-    const val = document.getElementById('customDateInput').value;
-    if (!val) { document.getElementById('customDateInput').focus(); return; }
+  function toggleDate(idx) {
+    const opts = document.querySelectorAll('.date-option');
+    const chk = document.getElementById('check-'+idx);
+    if (selectedDates.has(idx)) {
+      selectedDates.delete(idx);
+      opts[idx].classList.remove('selected');
+      chk.textContent = '';
+    } else {
+      selectedDates.add(idx);
+      opts[idx].classList.add('selected');
+      chk.textContent = '✓';
+    }
   }
 
-  const pickedIdxs = [...selectedDates];
-  pickedIdxs.forEach(i => votes[i]++);
-  updatePills();
+  function toggleCustom() {
+    const wrap = document.getElementById('customWrap');
+    const inp = document.getElementById('customDateInput');
+    const chk = document.getElementById('check-3');
+    customSelected = !customSelected;
+    wrap.classList.toggle('selected', customSelected);
+    inp.classList.toggle('show', customSelected);
+    chk.textContent = customSelected ? '✓' : '';
+    if (customSelected) { selectedDates.add(3); inp.focus(); }
+    else { selectedDates.delete(3); }
+  }
+
+  function renderVoteBars(containerId) {
+    const max = Math.max(...votes, 1);
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Other"].forEach((lbl,i) => {
+      const pct = Math.round((votes[i]/max)*100);
+      container.innerHTML += `<div class="vote-bar-row">
+        <div class="vote-bar-label">${lbl}</div>
+        <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%"></div></div>
+        <div class="vote-bar-count">${votes[i]}</div>
+      </div>`;
+    });
+  }
+
+  function updatePills() {
+    for (let i=0;i<4;i++) {
+      const el = document.getElementById('pill-'+i);
+      if (el) el.textContent = votes[i]===1?'1 available':votes[i]+' available';
+    }
+  }
+
+  function runAway() {
+    const btn = document.getElementById('btnNo');
+    const row = document.getElementById('btnRow');
+    const rowRect = row.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const maxX = rowRect.width - btnRect.width - 10;
+    const nx = Math.max(0, Math.random()*maxX);
+    const ny = (Math.random()-0.5)*40;
+    btn.style.left = nx+'px';
+    btn.style.top = ny+'px';
+    btn.style.right = 'unset';
+    btn.style.transition = 'left 0.18s ease, top 0.18s ease';
+  }
+
+  function formatDate(val) {
+    const d = new Date(val+'T00:00:00');
+    return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  }
+
+  function submitYes() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) {
+      const inp = document.getElementById('nameInput');
+      inp.focus(); inp.style.borderColor='#e07a99';
+      setTimeout(()=>inp.style.borderColor='',1200); return;
+    }
+    if (selectedDates.size === 0) {
+      document.getElementById('datesGrid').style.outline='2px solid #f4a7b9';
+      document.getElementById('datesGrid').style.borderRadius='16px';
+      setTimeout(()=>{document.getElementById('datesGrid').style.outline='';},1200); return;
+    }
+    if (selectedDates.has(3)) {
+      const val = document.getElementById('customDateInput').value;
+      if (!val) { document.getElementById('customDateInput').focus(); return; }
+    }
+
+    const pickedIdxs = [...selectedDates];
+    pickedIdxs.forEach(i => votes[i]++);
+    updatePills();
+    renderVoteBars('voteBars');
+
+    const customVal = document.getElementById('customDateInput').value;
+    const pickedLabels = pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_FULL[i]);
+    responses.push({name, dates: pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_LABELS[i])});
+
+    const datesStr = pickedLabels.length===1
+      ? pickedLabels[0]
+      : pickedLabels.slice(0,-1).join(', ')+' & '+pickedLabels[pickedLabels.length-1];
+
+    document.getElementById('successMsg').innerHTML =
+      `Can't wait to see you, <strong>${name}</strong>! 🧸<br/>
+       You're free on <em>${datesStr}</em>.<br/>
+       Marcky will lock in the best date for everyone 💕`;
+
+    document.getElementById('formContent').classList.add('hide');
+    document.getElementById('successScreen').classList.add('show');
+  }
+
+  function showAdmin() {
+    document.getElementById('inviteView').style.display='none';
+    document.getElementById('adminView').classList.remove('show');
+    document.getElementById('adminLoginView').style.display='block';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwError').style.display='none';
+  }
+
+  function checkPw() {
+    const val = document.getElementById('pwInput').value;
+    if (val === ADMIN_PW) {
+      document.getElementById('adminLoginView').style.display='none';
+      renderAdminView();
+      document.getElementById('adminView').classList.add('show');
+    } else {
+      document.getElementById('pwError').style.display='block';
+    }
+  }
+
+  function renderAdminView() {
+    renderVoteBars('adminVoteBars');
+    const maxVotes = Math.max(...votes);
+    const winnerIdx = votes.indexOf(maxVotes);
+    const winnerEl = document.getElementById('winnerDate');
+    const countEl = document.getElementById('winnerCount');
+    if (maxVotes === 0) {
+      winnerEl.innerHTML = '<span class="no-winner">No responses yet — share the link!</span>';
+      countEl.textContent = '';
+    } else {
+      const ties = votes.filter(v=>v===maxVotes).length;
+      winnerEl.textContent = DATE_FULL[winnerIdx];
+      countEl.textContent = ties>1
+        ? `${maxVotes} girl${maxVotes>1?'s':''} available · tied with ${ties-1} other date${ties>2?'s':''}`
+        : `${maxVotes} girl${maxVotes>1?'s':''} available`;
+    }
+    const list = document.getElementById('responsesList');
+    if (responses.length === 0) {
+      list.innerHTML = '<div class="empty-state">No RSVPs yet 🌸</div>';
+    } else {
+      list.innerHTML = responses.map(r=>`
+        <div class="response-row">
+          <div class="response-name">👩 ${r.name}</div>
+          <div class="response-dates">${r.dates.map(d=>`<span class="response-date-pill">${d}</span>`).join('')}</div>
+        </div>`).join('');
+    }
+  }
+
+  function showInvite() {
+    document.getElementById('adminLoginView').style.display='none';
+    document.getElementById('adminView').classList.remove('show');
+    document.getElementById('inviteView').style.display='block';
+  }
+
   renderVoteBars('voteBars');
 
-  const customVal = document.getElementById('customDateInput').value;
-  const pickedLabels = pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_FULL[i]);
-
-  responses.push({name, dates: pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_LABELS[i])});
-
-  const datesStr = pickedLabels.length===1
-    ? pickedLabels[0]
-    : pickedLabels.slice(0,-1).join(', ')+' & '+pickedLabels[pickedLabels.length-1];
-
-  document.getElementById('successMsg').innerHTML =
-    `Can't wait to see you, <strong>${name}</strong>! 🧸<br/>
-     You're free on <em>${datesStr}</em>.<br/>
-     Marcky will lock in the best date for everyone 💕`;
-
-  document.getElementById('formContent').classList.add('hide');
-  document.getElementById('successScreen').classList.add('show');
-}
-
-function formatDate(val) {
-  const d = new Date(val+'T00:00:00');
-  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-}
-
-function showAdmin() {
-  document.getElementById('inviteView').style.display='none';
-  document.getElementById('adminView').classList.remove('show');
-  document.getElementById('adminLoginView').style.display='block';
-  document.getElementById('pwInput').value='';
-  document.getElementById('pwError').style.display='none';
-}
-
-function checkPw() {
-  const val = document.getElementById('pwInput').value;
-  if (val === ADMIN_PW) {
-    document.getElementById('adminLoginView').style.display='none';
-    renderAdminView();
-    document.getElementById('adminView').classList.add('show');
-  } else {
-    document.getElementById('pwError').style.display='block';
-  }
-}
-
-function renderAdminView() {
-  renderVoteBars('adminVoteBars');
-
-  const maxVotes = Math.max(...votes);
-  const winnerIdx = votes.indexOf(maxVotes);
-  const winnerEl = document.getElementById('winnerDate');
-  const countEl = document.getElementById('winnerCount');
-
-  if (maxVotes === 0) {
-    winnerEl.innerHTML = '<span class="no-winner">No responses yet — share the link!</span>';
-    countEl.textContent = '';
-  } else {
-    const ties = votes.filter(v=>v===maxVotes).length;
-    winnerEl.textContent = DATE_FULL[winnerIdx];
-    countEl.textContent = ties>1
-      ? `${maxVotes} girl${maxVotes>1?'s':''} available · tied with ${ties-1} other date${ties>2?'s':''}`
-      : `${maxVotes} girl${maxVotes>1?'s':''} available`;
-  }
-
-  const list = document.getElementById('responsesList');
-  if (responses.length === 0) {
-    list.innerHTML = '<div class="empty-state">No RSVPs yet 🌸</div>';
-  } else {
-    list.innerHTML = responses.map(r=>`
-      <div class="response-row">
-        <div class="response-name">👩 ${r.name}</div>
-        <div class="response-dates">
-          ${r.dates.map(d=>`<span class="response-date-pill">${d}</span>`).join('')}
-        </div>
-      </div>`).join('');
-  }
-}
-
-function showInvite() {
-  document.getElementById('adminLoginView').style.display='none';
-  document.getElementById('adminView').classList.remove('show');
-  document.getElementById('inviteView').style.display='block';
-}
-
-renderVoteBars('voteBars');
-
-const url = window.location.search;
-if (url.includes('admin=true')) showAdmin();
+  if (window.location.search.includes('admin=true')) showAdmin();
 </script>
 </body>
 </html>
