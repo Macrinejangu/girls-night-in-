@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Casa Marcky – Pajama Night</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#f4a7b9;--rose-deep:#e07a99;--blush:#fde8ef;--blush-light:#fff5f8;
+  --lavender:#e8d5f5;--lav-deep:#c9a8e8;--cream:#fff9f0;
+  --text-dark:#3d1f2e;--text-mid:#7a4060;--text-soft:#b07090;--white:#ffffff;
+}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#fde8ef 0%,#f5e6fa 40%,#fde8ef 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+.card{background:var(--white);border-radius:32px;max-width:560px;width:100%;padding:3rem 2.5rem 2.5rem;box-shadow:0 8px 60px rgba(224,122,153,.18),0 2px 12px rgba(200,100,150,.08);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,#fde8ef 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+.card::after{content:'';position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;background:radial-gradient(circle,#e8d5f5 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+.emoji-row{text-align:center;font-size:2rem;letter-spacing:.3rem;margin-bottom:1rem;}
+h1{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--text-dark);text-align:center;line-height:1.2;margin-bottom:.4rem;}
+h1 em{font-style:italic;color:var(--rose-deep);}
+.subtitle{font-size:.95rem;color:var(--text-soft);text-align:center;margin-bottom:.2rem;font-weight:300;}
+.venue-tag{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--blush);color:var(--rose-deep);font-size:.8rem;font-weight:500;padding:4px 14px;border-radius:20px;width:fit-content;margin:0 auto 1.8rem;}
+.section-label{font-size:.75rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:.8rem;text-align:center;}
+.hint{font-size:.78rem;color:var(--text-soft);text-align:center;margin-bottom:.8rem;font-weight:300;}
+.dates-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:1.6rem;}
+.date-option{display:flex;align-items:center;justify-content:space-between;border:1.5px solid #f0d4e0;border-radius:16px;padding:14px 18px;cursor:pointer;transition:all .22s ease;background:var(--blush-light);user-select:none;}
+.date-option:hover{border-color:var(--rose);background:var(--blush);transform:translateY(-1px);}
+.date-option.selected{border-color:var(--rose-deep);background:linear-gradient(135deg,#fde8ef,#f5e0f8);box-shadow:0 2px 16px rgba(224,122,153,.2);}
+.date-left{display:flex;align-items:center;gap:12px;}
+.date-icon{width:42px;height:42px;border-radius:12px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;transition:background .22s;}
+.date-option.selected .date-icon{background:var(--rose-deep);}
+.date-title{font-weight:500;font-size:.92rem;color:var(--text-dark);margin-bottom:2px;}
+.date-sub{font-size:.78rem;color:var(--text-soft);font-weight:300;}
+.vote-pill{background:var(--lavender);color:var(--text-mid);font-size:.72rem;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;transition:all .22s;}
+.date-option.selected .vote-pill{background:var(--rose-deep);color:white;}
+.check-indicator{width:22px;height:22px;border-radius:50%;border:2px solid #f0d4e0;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;transition:all .22s;margin-left:8px;}
+.date-option.selected .check-indicator{background:var(--rose-deep);border-color:var(--rose-deep);color:white;}
+.custom-date-wrap{border:1.5px dashed #e0b8cc;border-radius:16px;padding:14px 18px;background:var(--blush-light);cursor:pointer;transition:all .22s;}
+.custom-date-wrap:hover{border-color:var(--rose);background:var(--blush);}
+.custom-date-wrap.selected{border-color:var(--rose-deep);background:linear-gradient(135deg,#fde8ef,#f5e0f8);}
+.custom-top{display:flex;align-items:center;gap:12px;}
+.custom-date-input{margin-top:12px;width:100%;border:1px solid #f0d4e0;border-radius:10px;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text-dark);background:white;outline:none;transition:border .2s;display:none;}
+.custom-date-input:focus{border-color:var(--rose-deep);}
+.custom-date-input.show{display:block;}
+.name-section{margin-bottom:1.6rem;}
+.name-input{width:100%;border:1.5px solid #f0d4e0;border-radius:14px;padding:12px 18px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text-dark);background:var(--blush-light);outline:none;transition:border .2s,background .2s;}
+.name-input:focus{border-color:var(--rose-deep);background:white;}
+.name-input::placeholder{color:#d4a0b5;}
+.btn-row{display:flex;gap:12px;justify-content:center;position:relative;min-height:54px;align-items:center;}
+.btn-yes{background:linear-gradient(135deg,var(--rose-deep),#c85d88);color:white;border:none;border-radius:50px;padding:14px 36px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 4px 16px rgba(224,122,153,.35);letter-spacing:.02em;}
+.btn-yes:hover{transform:scale(1.04);box-shadow:0 6px 24px rgba(224,122,153,.45);}
+.btn-no{background:transparent;color:var(--text-soft);border:1.5px solid #f0d4e0;border-radius:50px;padding:13px 28px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;position:absolute;right:0;white-space:nowrap;}
+.divider{height:1px;background:linear-gradient(to right,transparent,#f0d4e0,transparent);margin:1.6rem 0;}
+.votes-section{margin-top:.5rem;}
+.votes-title{font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);margin-bottom:.8rem;text-align:center;}
+.vote-bars{display:flex;flex-direction:column;gap:8px;}
+.vote-bar-row{display:flex;align-items:center;gap:10px;}
+.vote-bar-label{font-size:.75rem;color:var(--text-mid);width:90px;flex-shrink:0;}
+.vote-bar-track{flex:1;height:8px;background:var(--blush);border-radius:10px;overflow:hidden;}
+.vote-bar-fill{height:100%;background:linear-gradient(to right,var(--rose),var(--rose-deep));border-radius:10px;transition:width .5s ease;}
+.vote-bar-count{font-size:.72rem;color:var(--text-soft);width:30px;text-align:right;font-weight:500;}
+.success-screen{display:none;text-align:center;padding:1.5rem 0;}
+.success-screen.show{display:block;}
+.form-content.hide{display:none;}
+.check-circle{width:64px;height:64px;background:linear-gradient(135deg,var(--rose),var(--rose-deep));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.2rem;box-shadow:0 4px 20px rgba(224,122,153,.3);}
+.success-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--text-dark);margin-bottom:.5rem;}
+.success-msg{color:var(--text-soft);font-size:.9rem;font-weight:300;line-height:1.6;}
+.signature{text-align:center;margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid #f5dce8;}
+.signature-text{font-family:'Playfair Display',serif;font-style:italic;color:var(--rose-deep);font-size:1.1rem;}
+.signature-sub{font-size:.75rem;color:var(--text-soft);margin-top:2px;font-weight:300;}
+
+/* ADMIN */
+.admin-screen{display:none;padding:.5rem 0;}
+.admin-screen.show{display:block;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--text-dark);}
+.admin-badge{background:var(--blush);color:var(--rose-deep);font-size:.7rem;font-weight:500;padding:3px 10px;border-radius:20px;}
+.winner-card{background:linear-gradient(135deg,#fde8ef,#f5e0f8);border:1.5px solid var(--rose);border-radius:20px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;text-align:center;}
+.winner-label{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:.4rem;}
+.winner-date{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:.2rem;}
+.winner-count{font-size:.82rem;color:var(--rose-deep);font-weight:500;}
+.no-winner{font-size:.88rem;color:var(--text-soft);font-style:italic;}
+.admin-section-label{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:.8rem;}
+.responses-list{display:flex;flex-direction:column;gap:8px;}
+.response-row{background:var(--blush-light);border:1px solid #f0d4e0;border-radius:14px;padding:12px 16px;}
+.response-name{font-weight:500;font-size:.88rem;color:var(--text-dark);margin-bottom:5px;}
+.response-dates{display:flex;flex-wrap:wrap;gap:5px;}
+.response-date-pill{background:var(--lavender);color:var(--text-mid);font-size:.72rem;padding:3px 10px;border-radius:20px;}
+.empty-state{text-align:center;color:var(--text-soft);font-size:.85rem;font-style:italic;padding:1.5rem 0;}
+.admin-pw-wrap{text-align:center;padding:1rem 0;}
+.admin-pw-input{border:1.5px solid #f0d4e0;border-radius:14px;padding:11px 18px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text-dark);background:var(--blush-light);outline:none;width:100%;margin-bottom:10px;transition:border .2s;}
+.admin-pw-input:focus{border-color:var(--rose-deep);}
+.admin-pw-btn{background:var(--rose-deep);color:white;border:none;border-radius:50px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;}
+.admin-pw-error{color:#c85d88;font-size:.8rem;margin-top:6px;display:none;}
+.back-link{font-size:.78rem;color:var(--text-soft);cursor:pointer;text-decoration:underline;margin-top:1rem;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- INVITE FORM -->
+  <div id="inviteView">
+    <div class="form-content" id="formContent">
+      <div class="emoji-row">🌙 🧸 ✨</div>
+      <h1>You're invited, <em>love</em></h1>
+      <p class="subtitle">to a cosy pajama night & chill hangout</p>
+      <div class="venue-tag">🏡 Casa Marcky &nbsp;·&nbsp; <span style="font-weight:300;font-style:italic">my place!</span></div>
+
+      <p class="section-label">Pick every night you can make it ✨</p>
+      <p class="hint">Select all that work for you — we'll find the best fit for everyone 🌸</p>
+
+      <div class="dates-grid" id="datesGrid">
+        <div class="date-option" data-idx="0" onclick="toggleDate(0)">
+          <div class="date-left">
+            <div class="date-icon">🌸</div>
+            <div><div class="date-title">Saturday Night</div><div class="date-sub">June 6 · 2026</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="vote-pill" id="pill-0">0 available</div>
+            <div class="check-indicator" id="check-0"></div>
+          </div>
+        </div>
+
+        <div class="date-option" data-idx="1" onclick="toggleDate(1)">
+          <div class="date-left">
+            <div class="date-icon">🌷</div>
+            <div><div class="date-title">Sunday Night</div><div class="date-sub">June 7 · 2026</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="vote-pill" id="pill-1">0 available</div>
+            <div class="check-indicator" id="check-1"></div>
+          </div>
+        </div>
+
+        <div class="date-option" data-idx="2" onclick="toggleDate(2)">
+          <div class="date-left">
+            <div class="date-icon">🌺</div>
+            <div><div class="date-title">Saturday Night</div><div class="date-sub">June 13 · 2026</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="vote-pill" id="pill-2">0 available</div>
+            <div class="check-indicator" id="check-2"></div>
+          </div>
+        </div>
+
+        <div class="custom-date-wrap" id="customWrap" onclick="toggleCustom()">
+          <div class="custom-top">
+            <div class="date-icon" id="customIcon">💫</div>
+            <div style="flex:1"><div class="date-title">Suggest another date</div><div class="date-sub">Something else works better?</div></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="vote-pill" id="pill-3">0 available</div>
+              <div class="check-indicator" id="check-3"></div>
+            </div>
+          </div>
+          <input type="date" class="custom-date-input" id="customDateInput" onclick="event.stopPropagation()" min="2026-06-01"/>
+        </div>
+      </div>
+
+      <div class="name-section">
+        <p class="section-label">And your name, gorgeous?</p>
+        <input type="text" class="name-input" id="nameInput" placeholder="Your name..." maxlength="40"/>
+      </div>
+
+      <div class="btn-row" id="btnRow">
+        <button class="btn-yes" onclick="submitYes()">Count me in! 💕</button>
+        <button class="btn-no" id="btnNo" onmouseenter="runAway()" ontouchstart="runAway()">No thanks</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="votes-section">
+        <p class="votes-title">🗓️ Availability so far</p>
+        <div class="vote-bars" id="voteBars"></div>
+      </div>
+
+      <div class="signature">
+        <div class="signature-text">With all the love — Marcky 🌸</div>
+        <div class="signature-sub">come as you are, bring your cosy self</div>
+      </div>
+    </div>
+
+    <div class="success-screen" id="successScreen">
+      <div class="check-circle">🎀</div>
+      <h2 class="success-title">Yay, you're in!</h2>
+      <p class="success-msg" id="successMsg"></p>
+      <div style="margin-top:1.5rem;"><div class="signature-text">See you soon — Marcky 🌙</div></div>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div id="adminLoginView" style="display:none;">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2rem;margin-bottom:.8rem;">🔑</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:.3rem;">Host view</div>
+      <div style="font-size:.82rem;color:var(--text-soft);font-weight:300;">Just for Marcky 🌸</div>
+    </div>
+    <div class="admin-pw-wrap">
+      <input type="password" class="admin-pw-input" id="pwInput" placeholder="Enter your password..." onkeydown="if(event.key==='Enter')checkPw()"/>
+      <button class="admin-pw-btn" onclick="checkPw()">Enter ✨</button>
+      <div class="admin-pw-error" id="pwError">Hmm, that's not it 🙈</div>
+      <div><span class="back-link" onclick="showInvite()">← Back to invite</span></div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="admin-screen" id="adminView">
+    <div class="admin-header">
+      <div class="admin-title">Host Dashboard 🌸</div>
+      <div class="admin-badge">Marcky only</div>
+    </div>
+
+    <div class="winner-card" id="winnerCard">
+      <div class="winner-label">✨ Best date for everyone</div>
+      <div class="winner-date" id="winnerDate">No responses yet</div>
+      <div class="winner-count" id="winnerCount"></div>
+    </div>
+
+    <div style="margin-bottom:1.4rem;">
+      <div class="admin-section-label">📊 Availability breakdown</div>
+      <div class="vote-bars" id="adminVoteBars"></div>
+    </div>
+
+    <div>
+      <div class="admin-section-label">👯 Who said what</div>
+      <div class="responses-list" id="responsesList"></div>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:center;">
+      <span class="back-link" onclick="showInvite()">← Back to invite</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const DATE_LABELS = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Custom date"];
+const DATE_FULL = ["Saturday, June 6","Sunday, June 7","Saturday, June 13","a custom date"];
+const ADMIN_PW = "marcky2026";
+
+let votes = [0,0,0,0];
+let responses = [];
+let selectedDates = new Set();
+let customSelected = false;
+
+function toggleDate(idx) {
+  const opt = document.querySelectorAll('.date-option')[idx];
+  const chk = document.getElementById('check-'+idx);
+  if (selectedDates.has(idx)) {
+    selectedDates.delete(idx);
+    opt.classList.remove('selected');
+    chk.textContent = '';
+  } else {
+    selectedDates.add(idx);
+    opt.classList.add('selected');
+    chk.textContent = '✓';
+  }
+}
+
+function toggleCustom() {
+  const wrap = document.getElementById('customWrap');
+  const inp = document.getElementById('customDateInput');
+  const chk = document.getElementById('check-3');
+  customSelected = !customSelected;
+  wrap.classList.toggle('selected', customSelected);
+  inp.classList.toggle('show', customSelected);
+  chk.textContent = customSelected ? '✓' : '';
+  if (customSelected) {
+    selectedDates.add(3);
+    inp.focus();
+  } else {
+    selectedDates.delete(3);
+  }
+}
+
+function renderVoteBars(containerId) {
+  const max = Math.max(...votes, 1);
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const labels = ["Sat Jun 6","Sun Jun 7","Sat Jun 13","Other"];
+  labels.forEach((lbl,i) => {
+    const pct = Math.round((votes[i]/max)*100);
+    container.innerHTML += `<div class="vote-bar-row">
+      <div class="vote-bar-label">${lbl}</div>
+      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%"></div></div>
+      <div class="vote-bar-count">${votes[i]}</div>
+    </div>`;
+  });
+}
+
+function updatePills() {
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById('pill-'+i);
+    if (el) el.textContent = votes[i]===1?'1 available':votes[i]+' available';
+  }
+}
+
+function runAway() {
+  const btn = document.getElementById('btnNo');
+  const row = document.getElementById('btnRow');
+  const rowRect = row.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+  const maxX = rowRect.width - btnRect.width - 10;
+  const nx = Math.max(0, Math.random()*maxX);
+  const ny = (Math.random()-0.5)*40;
+  btn.style.left = nx+'px';
+  btn.style.top = ny+'px';
+  btn.style.right = 'unset';
+  btn.style.transition = 'left 0.18s ease, top 0.18s ease';
+}
+
+function submitYes() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) {
+    const inp = document.getElementById('nameInput');
+    inp.focus(); inp.style.borderColor='#e07a99';
+    setTimeout(()=>inp.style.borderColor='',1200); return;
+  }
+  if (selectedDates.size === 0) {
+    document.getElementById('datesGrid').style.outline='2px solid #f4a7b9';
+    document.getElementById('datesGrid').style.borderRadius='16px';
+    setTimeout(()=>{document.getElementById('datesGrid').style.outline='';},1200); return;
+  }
+  if (selectedDates.has(3)) {
+    const val = document.getElementById('customDateInput').value;
+    if (!val) { document.getElementById('customDateInput').focus(); return; }
+  }
+
+  const pickedIdxs = [...selectedDates];
+  pickedIdxs.forEach(i => votes[i]++);
+  updatePills();
+  renderVoteBars('voteBars');
+
+  const customVal = document.getElementById('customDateInput').value;
+  const pickedLabels = pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_FULL[i]);
+
+  responses.push({name, dates: pickedIdxs.map(i => i===3 && customVal ? formatDate(customVal) : DATE_LABELS[i])});
+
+  const datesStr = pickedLabels.length===1
+    ? pickedLabels[0]
+    : pickedLabels.slice(0,-1).join(', ')+' & '+pickedLabels[pickedLabels.length-1];
+
+  document.getElementById('successMsg').innerHTML =
+    `Can't wait to see you, <strong>${name}</strong>! 🧸<br/>
+     You're free on <em>${datesStr}</em>.<br/>
+     Marcky will lock in the best date for everyone 💕`;
+
+  document.getElementById('formContent').classList.add('hide');
+  document.getElementById('successScreen').classList.add('show');
+}
+
+function formatDate(val) {
+  const d = new Date(val+'T00:00:00');
+  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+}
+
+function showAdmin() {
+  document.getElementById('inviteView').style.display='none';
+  document.getElementById('adminView').classList.remove('show');
+  document.getElementById('adminLoginView').style.display='block';
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').style.display='none';
+}
+
+function checkPw() {
+  const val = document.getElementById('pwInput').value;
+  if (val === ADMIN_PW) {
+    document.getElementById('adminLoginView').style.display='none';
+    renderAdminView();
+    document.getElementById('adminView').classList.add('show');
+  } else {
+    document.getElementById('pwError').style.display='block';
+  }
+}
+
+function renderAdminView() {
+  renderVoteBars('adminVoteBars');
+
+  const maxVotes = Math.max(...votes);
+  const winnerIdx = votes.indexOf(maxVotes);
+  const winnerEl = document.getElementById('winnerDate');
+  const countEl = document.getElementById('winnerCount');
+
+  if (maxVotes === 0) {
+    winnerEl.innerHTML = '<span class="no-winner">No responses yet — share the link!</span>';
+    countEl.textContent = '';
+  } else {
+    const ties = votes.filter(v=>v===maxVotes).length;
+    winnerEl.textContent = DATE_FULL[winnerIdx];
+    countEl.textContent = ties>1
+      ? `${maxVotes} girl${maxVotes>1?'s':''} available · tied with ${ties-1} other date${ties>2?'s':''}`
+      : `${maxVotes} girl${maxVotes>1?'s':''} available`;
+  }
+
+  const list = document.getElementById('responsesList');
+  if (responses.length === 0) {
+    list.innerHTML = '<div class="empty-state">No RSVPs yet 🌸</div>';
+  } else {
+    list.innerHTML = responses.map(r=>`
+      <div class="response-row">
+        <div class="response-name">👩 ${r.name}</div>
+        <div class="response-dates">
+          ${r.dates.map(d=>`<span class="response-date-pill">${d}</span>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+}
+
+function showInvite() {
+  document.getElementById('adminLoginView').style.display='none';
+  document.getElementById('adminView').classList.remove('show');
+  document.getElementById('inviteView').style.display='block';
+}
+
+renderVoteBars('voteBars');
+
+const url = window.location.search;
+if (url.includes('admin=true')) showAdmin();
+</script>
+</body>
+</html>
